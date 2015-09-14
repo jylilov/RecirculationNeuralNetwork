@@ -1,0 +1,4 @@
+.gradle/
+.idea/
+RecirculationNeuralNetwork.iml
+build/

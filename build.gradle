@@ -1,0 +1,8 @@
+group 'by.jylilov'
+version '0.1'
+
+apply plugin: 'application'
+
+mainClassName = 'by.jylilov.rnn.RNNApplication'
+
+sourceCompatibility = 1.8
