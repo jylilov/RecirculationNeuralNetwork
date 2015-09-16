@@ -37,7 +37,7 @@ public class ImageUtils {
             if ((i + 1) % 4 == 0) {
                 continue;
             }
-            answer[k++] = buffer[i] / 128f;
+            answer[k++] = ((buffer[i] + 128f) / 255f) * 2 - 1;
         }
         return answer;
     }
@@ -47,7 +47,14 @@ public class ImageUtils {
         int k = 0;
         for (int i = 0; i < buffer.length; ++i) {
             if ((k + 1) % 4 == 0) answer[k++] = -1;
-            answer[k++] = (byte) (buffer[i] * 128);
+            int a = Math.round((buffer[i] + 1f) / 2f * 255f - 128f);
+            if (a < -128) {
+                answer[k++] = -128;
+            } else if (a > 127) {
+                answer[k++] = 127;
+            } else {
+                answer[k++] = (byte) a;
+            }
         }
         answer[k] = -1;
         return answer;
