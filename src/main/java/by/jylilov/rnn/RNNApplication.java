@@ -30,6 +30,7 @@ public class RNNApplication extends Application {
     private final IntegerTextField lTextField = new IntegerTextField();
     private final IntegerTextField wTextField = new IntegerTextField(1, Integer.MAX_VALUE, 64);
     private final IntegerTextField hTextField = new IntegerTextField(1, Integer.MAX_VALUE, 64);
+    private final FloatTextField zTextField = new FloatTextField();
     private final FloatTextField minErrorTextField = new FloatTextField(0, Float.MAX_VALUE, 1e-5f);
 
     private final ImageView sourceImageView = new ImageView(DEFAULT_IMAGE);
@@ -37,7 +38,7 @@ public class RNNApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene(rootPane, 800, 275);
+        Scene scene = new Scene(rootPane, 900, 310);
 
         initView();
 
@@ -100,28 +101,31 @@ public class RNNApplication extends Application {
         settings.setVgap(10);
         settings.setPadding(new Insets(10));
 
-        settings.add(new Label("N:"), 1, 1);
-        settings.add(nTextField, 2, 1);
+        settings.add(new Label("P:"), 1, 1);
+        settings.add(pTextField, 2, 1);
+
+        settings.add(new Label("W:"), 1, 2);
+        settings.add(wTextField, 2, 2);
+
+        settings.add(new Label("H:"), 1, 3);
+        settings.add(hTextField, 2, 3);
+
+        settings.add(new Label("N:"), 1, 4);
+        settings.add(nTextField, 2, 4);
         nTextField.setEditable(false);
 
-        settings.add(new Label("P:"), 1, 2);
-        settings.add(pTextField, 2, 2);
-
-        settings.add(new Label("L:"), 1, 3);
-        settings.add(lTextField, 2, 3);
+        settings.add(new Label("L:"), 1, 5);
+        settings.add(lTextField, 2, 5);
         lTextField.setEditable(false);
 
-        settings.add(minErrorTextField, 2, 4);
-        settings.add(new Label("Min error:"), 1, 4);
+        settings.add(new Label("Z:"), 1, 6);
+        settings.add(zTextField, 2, 6);
+        zTextField.setEditable(false);
 
-        settings.add(new Label("W:"), 1, 5);
-        settings.add(wTextField, 2, 5);
+        settings.add(minErrorTextField, 2, 7);
+        settings.add(new Label("Min error:"), 1, 7);
 
-
-        settings.add(new Label("H:"), 1, 6);
-        settings.add(hTextField, 2, 6);
-
-        settings.add(new BorderPane(startTrainingButton), 1, 7, 2, 1);
+        settings.add(new BorderPane(startTrainingButton), 1, 8, 2, 1);
 
         bindSettingValues();
 
@@ -132,10 +136,21 @@ public class RNNApplication extends Application {
         nTextField.valueProperty().bind(wTextField.valueProperty().multiply(hTextField.valueProperty()).multiply(3));
         wTextField.maxValueProperty().bind(sourceImageView.getImage().widthProperty());
         hTextField.maxValueProperty().bind(sourceImageView.getImage().widthProperty());
-        ChangeListener<Number> listener = (observable, oldValue, newValue) -> updateLProperty();
-        wTextField.valueProperty().addListener(listener);
-        hTextField.valueProperty().addListener(listener);
+        ChangeListener<Number> lListener = (observable, oldValue, newValue) -> updateLProperty();
+        wTextField.valueProperty().addListener(lListener);
+        hTextField.valueProperty().addListener(lListener);
+        ChangeListener<Number> zListener = (observable, oldValue, newValue) -> updateZProperty();
+        nTextField.valueProperty().addListener(zListener);
+        lTextField.valueProperty().addListener(zListener);
+        pTextField.valueProperty().addListener(zListener);
         updateLProperty();
+        updateZProperty();
+    }
+
+    private void updateZProperty() {
+        float archive =(nTextField.getValue() + lTextField.getValue()) * pTextField.getValue();
+        float source = nTextField.getValue() * lTextField.getValue();
+        zTextField.setValue(archive / source);
     }
 
     private void updateLProperty() {
