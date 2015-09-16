@@ -34,10 +34,14 @@ public class RNNTrainingTask extends Task<RNN> {
         RNN rnn = new RNN(n, p);
         updateValue(rnn);
 
-        int iteration = 0;
+        long iteration = 0;
 
         float [][]w = rnn.getW();
         float [][]w_ = rnn.getW_();
+
+        for (int k = 0; k < trainingSet.size(); ++k) {
+            rnn.directStage(trainingSet.get(k), y[k]);
+        }
 
         while (e > minError) {
             e = 0;
@@ -46,11 +50,6 @@ public class RNNTrainingTask extends Task<RNN> {
             if (isCancelled()) {
                 break;
             }
-
-            for (int k = 0; k < trainingSet.size(); ++k) {
-                rnn.directStage(trainingSet.get(k), y[k]);
-            }
-
 
             for (int k = 0; k < trainingSet.size(); ++k) {
                 rnn.reverseStage(y[k], x_);
@@ -88,7 +87,7 @@ public class RNNTrainingTask extends Task<RNN> {
 
                 rnn.normalizeW_();
 
-                e += getError(x, x_);
+//                e += getError(x, x_);
             }
 
 
@@ -110,7 +109,15 @@ public class RNNTrainingTask extends Task<RNN> {
 
                 rnn.normalizeW();
 
-                e += getError(y[k], y_);
+//                e += getError(y[k], y_);
+            }
+
+            for (int k = 0; k < trainingSet.size(); ++k) {
+                rnn.directStage(trainingSet.get(k), y[k]);
+            }
+            for (int k = 0; k < l; ++k) {
+                rnn.reverseStage(y[k], x_);
+                e+= getError(x_, trainingSet.get(k));
             }
 
             updateMessage("Iteration = " + iteration + ", Error = " + e);
