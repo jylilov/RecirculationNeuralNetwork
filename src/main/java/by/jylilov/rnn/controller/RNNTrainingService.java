@@ -1,6 +1,7 @@
 package by.jylilov.rnn.controller;
 
 import by.jylilov.rnn.model.RNN;
+import by.jylilov.rnn.model.RNNTrainingAlgorithm;
 import by.jylilov.rnn.util.ImageUtils;
 import javafx.beans.property.*;
 import javafx.concurrent.Service;
@@ -13,7 +14,11 @@ public class RNNTrainingService extends Service<RNN> {
     private final IntegerProperty p = new SimpleIntegerProperty();
     private final IntegerProperty w = new SimpleIntegerProperty();
     private final IntegerProperty h = new SimpleIntegerProperty();
+    private final BooleanProperty isWithNormalization = new SimpleBooleanProperty(true);
+    private final BooleanProperty isWithAdaptiveLearningStep = new SimpleBooleanProperty(true);
+    private final ObjectProperty<RNNTrainingAlgorithm> algorithm = new SimpleObjectProperty<>();
 
+    private final FloatProperty alpha = new SimpleFloatProperty(0.01f);
     private final FloatProperty minError = new SimpleFloatProperty();
 
     private Image sourceImage;
@@ -36,10 +41,15 @@ public class RNNTrainingService extends Service<RNN> {
 //            }
 //            trainingSet.add(x);
 //        }
-//        rnnTask = new RNNTrainingTask(n.get(), p.get(), minError.get(), trainingSet);
+//        rnnTask = new RNNStratifiedTrainingTask(n.get(), p.get(), minError.get(), trainingSet);
 
-        trainingSet = ImageUtils.getDataSet(sourceImage, w.get(), h.get());
-        return new RNNTrainingTask(w.get() * h.get() * 3, p.get(), minError.get(), trainingSet);
+        trainingSet = ImageUtils.getDataSet(sourceImage, getW(), getH());
+        return getAlgorithm().buildTrainingTask(
+                getW() * getH() * 3, getP(),
+                getAlpha(), getMinError(),
+                trainingSet,
+                getIsWithNormalization(), getIsWithAdaptiveLearningStep()
+        );
     }
 
     public Image getOutImage() {
@@ -104,5 +114,53 @@ public class RNNTrainingService extends Service<RNN> {
 
     public void setSourceImage(Image sourceImage) {
         this.sourceImage = sourceImage;
+    }
+
+    public boolean getIsWithNormalization() {
+        return isWithNormalization.get();
+    }
+
+    public BooleanProperty isWithNormalizationProperty() {
+        return isWithNormalization;
+    }
+
+    public void setIsWithNormalization(boolean isWithNormalization) {
+        this.isWithNormalization.set(isWithNormalization);
+    }
+
+    public boolean getIsWithAdaptiveLearningStep() {
+        return isWithAdaptiveLearningStep.get();
+    }
+
+    public BooleanProperty isWithAdaptiveLearningStepProperty() {
+        return isWithAdaptiveLearningStep;
+    }
+
+    public void setIsWithAdaptiveLearningStep(boolean isWithAdaptiveLearningStep) {
+        this.isWithAdaptiveLearningStep.set(isWithAdaptiveLearningStep);
+    }
+
+    public float getAlpha() {
+        return alpha.get();
+    }
+
+    public FloatProperty alphaProperty() {
+        return alpha;
+    }
+
+    public void setAlpha(float alpha) {
+        this.alpha.set(alpha);
+    }
+
+    public RNNTrainingAlgorithm getAlgorithm() {
+        return algorithm.get();
+    }
+
+    public ObjectProperty<RNNTrainingAlgorithm> algorithmProperty() {
+        return algorithm;
+    }
+
+    public void setAlgorithm(RNNTrainingAlgorithm algorithm) {
+        this.algorithm.set(algorithm);
     }
 }
