@@ -2,9 +2,8 @@ package by.jylilov.rnn.util;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
-import javafx.scene.image.WritablePixelFormat;
+import javafx.scene.paint.Color;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,68 +12,68 @@ public class ImageUtils {
     public static List<float []> getDataSet(Image image, int w, int h) {
         List<float []> list = new ArrayList<>();
 
-        WritablePixelFormat<ByteBuffer> format = WritablePixelFormat.getByteBgraInstance();
-        byte a[] = new byte[w * h * 4];
-
         int width = (int)image.getWidth();
         int height = (int)image.getHeight();
+
         for (int i = 0; i < width; i += w) {
             if (i + w > width) i = width - w;
             for (int j = 0; j < height; j += h) {
                 if (j + h > height) j = height - h;
-                image.getPixelReader().getPixels(i, j, w, h, format, a, 0, w * 4);
-                list.add(convert(a));
+
+                int l = 0;
+                float x[] = new float[w * h * 3];
+
+                for (int ii = 0; ii < w; ++ii) {
+                    for (int jj = 0; jj < h; ++jj) {
+                        Color color = image.getPixelReader().getColor(i + ii, j + jj);
+                        x[l++] = directConvert(color.getRed());
+                        x[l++] = directConvert(color.getGreen());
+                        x[l++] = directConvert(color.getBlue());
+                    }
+                }
+
+                list.add(x);
             }
         }
 
         return list;
     }
 
-    private static float[] convert(byte [] buffer) {
-        float[] answer = new float[buffer.length / 4 * 3];
-        int k = 0;
-        for (int i = 0; i < buffer.length; ++i) {
-            if ((i + 1) % 4 == 0) {
-                continue;
-            }
-            answer[k++] = ((buffer[i] + 128f) / 255f) * 2 - 1;
-        }
-        return answer;
-    }
-
-    private static byte[] convert(float [] buffer) {
-        byte[] answer = new byte[buffer.length / 3 * 4];
-        int k = 0;
-        for (int i = 0; i < buffer.length; ++i) {
-            if ((k + 1) % 4 == 0) answer[k++] = -1;
-            int a = Math.round((buffer[i] + 1f) / 2f * 255f - 128f);
-            if (a < -128) {
-                answer[k++] = -128;
-            } else if (a > 127) {
-                answer[k++] = 127;
-            } else {
-                answer[k++] = (byte) a;
-            }
-        }
-        answer[k] = -1;
-        return answer;
+    private static float directConvert(double a) {
+        return (float) (a * 2 -  1);
     }
 
     public static Image restoreImage(List<float []> list, int w, int h, int width, int height) {
         WritableImage image = new WritableImage(width, height);
-
-        WritablePixelFormat<ByteBuffer> format = WritablePixelFormat.getByteBgraInstance();
 
         int k = 0;
         for (int i = 0; i < width; i += w) {
             if (i + w > width) i = width - w;
             for (int j = 0; j < height; j += h) {
                 if (j + h > height) j = height - h;
-                image.getPixelWriter().setPixels(i, j, w, h, format, convert(list.get(k++)), 0, w * 4);
+
+                int l = 0;
+                float x[] = list.get(k++);
+
+                for (int ii = 0; ii < w; ++ii) {
+                    for (int jj = 0; jj < h; ++jj) {
+                        float r = reverseConvert(x[l++]);
+                        float g = reverseConvert(x[l++]);
+                        float b = reverseConvert(x[l++]);
+                        image.getPixelWriter().setColor(i + ii, j + jj, new Color(r, g, b, 1));
+                    }
+                }
             }
         }
 
         return image;
+    }
+
+    private static float reverseConvert(float a) {
+        float ans = (a + 1) / 2;
+        if (ans < 0) ans = 0;
+        if (ans > 1) ans = 1;
+        return ans;
     }
 
 
