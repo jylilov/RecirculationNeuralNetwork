@@ -11,7 +11,11 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.net.MalformedURLException;
 
 public class RNNApplication extends Application {
 
@@ -49,6 +53,18 @@ public class RNNApplication extends Application {
             });
         });
 
+        sourceImageView.setOnMouseClicked(event -> {
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showOpenDialog(primaryStage);
+            if (file != null) {
+                try {
+                    sourceImageProperty().set(new Image(file.toURI().toURL().toString()));
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         primaryStage.setScene(scene);
         primaryStage.setTitle("Recirculation Neural Network Application");
         primaryStage.show();
@@ -69,8 +85,7 @@ public class RNNApplication extends Application {
         trainingService.adaptiveLearningStepProperty().bind(settings.adaptiveTrainingStepProperty());
         trainingService.normalizationProperty().bind(settings.normalizationProperty());
         trainingService.algorithmProperty().bind(settings.algorithmProperty());
-
-        trainingService.setSourceImage(DEFAULT_IMAGE);
+        trainingService.sourceImageProperty().bind(sourceImageProperty());
     }
 
     private Node initImageSplitView() {
