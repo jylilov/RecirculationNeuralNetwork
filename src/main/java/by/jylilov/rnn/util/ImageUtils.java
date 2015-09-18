@@ -39,10 +39,6 @@ public class ImageUtils {
         return list;
     }
 
-    private static float directConvert(double a) {
-        return (float) (a * 2 -  1);
-    }
-
     public static Image restoreImage(List<float []> list, int w, int h, int width, int height) {
         WritableImage image = new WritableImage(width, height);
 
@@ -67,6 +63,10 @@ public class ImageUtils {
         }
 
         return image;
+    }
+
+    private static float directConvert(double a) {
+        return (float) (a * 2 -  1);
     }
 
     private static float reverseConvert(float a) {

@@ -19,10 +19,10 @@ public class Settings extends Pane {
     private final RNNApplication application;
 
     private final IntegerTextField nTextField = new IntegerTextField();
-    private final IntegerTextField pTextField = new IntegerTextField(1, Integer.MAX_VALUE, 2);
+    private final IntegerTextField pTextField = new IntegerTextField(1, Integer.MAX_VALUE, 24);
     private final IntegerTextField lTextField = new IntegerTextField();
-    private final IntegerTextField wTextField = new IntegerTextField(1, Integer.MAX_VALUE, 64);
-    private final IntegerTextField hTextField = new IntegerTextField(1, Integer.MAX_VALUE, 64);
+    private final IntegerTextField wTextField = new IntegerTextField(1, Integer.MAX_VALUE, 4);
+    private final IntegerTextField hTextField = new IntegerTextField(1, Integer.MAX_VALUE, 4);
     private final FloatTextField zTextField = new FloatTextField();
     private final FloatTextField alphaTextField = new FloatTextField(0, Float.MAX_VALUE, 0.01f);
     private final FloatTextField minErrorTextField = new FloatTextField(0, Float.MAX_VALUE, 1e-5f);
@@ -43,8 +43,8 @@ public class Settings extends Pane {
     }
 
     private void initCheckBoxes() {
-        adaptiveLearningStepCheckBox.setSelected(true);
-        normalizationCheckBox.setSelected(true);
+        adaptiveLearningStepCheckBox.setSelected(false);
+        normalizationCheckBox.setSelected(false);
     }
 
     private void initNotEditable() {
@@ -106,7 +106,7 @@ public class Settings extends Pane {
 
     private void initAlgorithmComboBox() {
         algorithmComboBox.getItems().addAll(TrainingAlgorithm.values());
-        algorithmComboBox.setValue(TrainingAlgorithm.STRATIFIED_TRAINING);
+        algorithmComboBox.setValue(TrainingAlgorithm.BACK_PROPAGATION);
     }
 
     private void bindSettingValues() {
@@ -149,6 +149,10 @@ public class Settings extends Pane {
         int countW = width / w + (width % w != 0 ? 1 : 0);
         int countH = height / h + (height % h != 0 ? 1 : 0);
         lTextField.setValue(countW * countH);
+    }
+
+    public FloatProperty zProperty() {
+        return zTextField.valueProperty();
     }
 
     public IntegerProperty pProperty() {
