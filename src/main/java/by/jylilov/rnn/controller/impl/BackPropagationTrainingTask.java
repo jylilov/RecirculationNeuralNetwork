@@ -1,28 +1,28 @@
 package by.jylilov.rnn.controller.impl;
 
-import by.jylilov.rnn.controller.RNNTrainingTask;
-import by.jylilov.rnn.model.RNN;
+import by.jylilov.rnn.controller.TrainingTask;
+import by.jylilov.rnn.model.RecirculationNeuralNetwork;
 
 import java.util.List;
 
-public class RNNBackPropagationTrainingTask extends RNNTrainingTask {
+public class BackPropagationTrainingTask extends TrainingTask {
 
-    public RNNBackPropagationTrainingTask(
+    public BackPropagationTrainingTask(
             int n, int p,
             float alpha, float minError,
             List<float[]> trainingSet,
-            boolean isWithNormalisation, boolean isWithAdaptiveLearningStep
+            boolean normalisation, boolean adaptiveLearningStep
     ) {
-        super(n, p, alpha, minError, trainingSet, isWithNormalisation, isWithAdaptiveLearningStep);
+        super(n, p, alpha, minError, trainingSet, normalisation, adaptiveLearningStep);
     }
 
     @Override
-    protected RNN call() {
+    protected RecirculationNeuralNetwork call() {
         updateTitle("Back Propagation Training Network");
 
         float e = Float.MAX_VALUE;
 
-        RNN rnn = new RNN(n, p);
+        RecirculationNeuralNetwork rnn = new RecirculationNeuralNetwork(n, p);
         updateValue(rnn);
 
         long iteration = 0;
@@ -49,7 +49,7 @@ public class RNNBackPropagationTrainingTask extends RNNTrainingTask {
                 float alpha;
                 float alpha_;
 
-                if (isWithAdaptiveLearningStep) {
+                if (adaptiveLearningStep) {
                     alpha = alpha_ = 0;
                     for (int i = 0; i < n; ++i) {
                         alpha += Math.pow(x[i], 2);
@@ -78,7 +78,7 @@ public class RNNBackPropagationTrainingTask extends RNNTrainingTask {
                     }
                 }
 
-                if (isWithNormalisation) {
+                if (normalization) {
                     rnn.normalizeW();
                     rnn.normalizeW_();
                 }

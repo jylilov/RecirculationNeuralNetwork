@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class RNN {
+public class RecirculationNeuralNetwork {
     private final int n;
     private final int p;
 
     private final float w[][];
     private final float w_[][];
 
-    public RNN(int n, int p) {
+    public RecirculationNeuralNetwork(int n, int p) {
         this.n = n;
         this.p = p;
         this.w = new float[n][p];

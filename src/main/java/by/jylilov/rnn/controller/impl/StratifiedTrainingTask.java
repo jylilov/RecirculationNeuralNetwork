@@ -1,28 +1,28 @@
 package by.jylilov.rnn.controller.impl;
 
-import by.jylilov.rnn.controller.RNNTrainingTask;
-import by.jylilov.rnn.model.RNN;
+import by.jylilov.rnn.controller.TrainingTask;
+import by.jylilov.rnn.model.RecirculationNeuralNetwork;
 
 import java.util.List;
 
-public class RNNStratifiedTrainingTask extends RNNTrainingTask {
+public class StratifiedTrainingTask extends TrainingTask {
 
-    public RNNStratifiedTrainingTask(
+    public StratifiedTrainingTask(
             int n, int p,
             float alpha, float minError,
             List<float[]> trainingSet,
-            boolean isWithNormalisation, boolean isWithAdaptiveLearningStep
+            boolean normalisation, boolean adaptiveLearningStep
     ) {
-        super(n, p, alpha, minError, trainingSet, isWithNormalisation, isWithAdaptiveLearningStep);
+        super(n, p, alpha, minError, trainingSet, normalisation, adaptiveLearningStep);
     }
 
     @Override
-    protected RNN call() {
+    protected RecirculationNeuralNetwork call() {
         updateTitle("Stratified Training Network");
 
         float e = Float.MAX_VALUE;
 
-        RNN rnn = new RNN(n, p);
+        RecirculationNeuralNetwork rnn = new RecirculationNeuralNetwork(n, p);
         updateValue(rnn);
 
         long iteration = 0;
@@ -50,7 +50,7 @@ public class RNNStratifiedTrainingTask extends RNNTrainingTask {
         return rnn;
     }
 
-    private float calcError(RNN rnn, float[][] y) {
+    private float calcError(RecirculationNeuralNetwork rnn, float[][] y) {
         float e = 0;
         float[] x_ = new float[n];
         for (int k = 0; k < l; ++k) {
@@ -60,13 +60,13 @@ public class RNNStratifiedTrainingTask extends RNNTrainingTask {
         return e;
     }
 
-    private void directStage(RNN rnn, float[][] y) {
+    private void directStage(RecirculationNeuralNetwork rnn, float[][] y) {
         for (int k = 0; k < trainingSet.size(); ++k) {
             rnn.directStage(trainingSet.get(k), y[k]);
         }
     }
 
-    private void trainMainLayout(RNN rnn, float[][] y) {
+    private void trainMainLayout(RecirculationNeuralNetwork rnn, float[][] y) {
         float[][] w = rnn.getW();
         float[] y_ = new float[p];
         for (int k = 0; k < l; ++k) {
@@ -74,7 +74,7 @@ public class RNNStratifiedTrainingTask extends RNNTrainingTask {
             rnn.directStage(x, y_);
 
             float alphaW;
-            if (isWithAdaptiveLearningStep) {
+            if (adaptiveLearningStep) {
                 alphaW = 0;
                 for (int i = 0; i < n; ++i) {
                     alphaW += Math.pow(x[i], 2);
@@ -90,11 +90,11 @@ public class RNNStratifiedTrainingTask extends RNNTrainingTask {
                 }
             }
 
-            if (isWithNormalisation) rnn.normalizeW();
+            if (normalization) rnn.normalizeW();
         }
     }
 
-    private void trainHiddenLayout(RNN rnn, float[][] y) {
+    private void trainHiddenLayout(RecirculationNeuralNetwork rnn, float[][] y) {
         float[][] w_ = rnn.getW_();
         float[] x_ = new float[n];
         float[] gamma = new float[p];
@@ -104,7 +104,7 @@ public class RNNStratifiedTrainingTask extends RNNTrainingTask {
 
             float alphaW_;
 
-            if (isWithAdaptiveLearningStep) {
+            if (adaptiveLearningStep) {
                 alphaW_ = 0;
                 for (int j = 0; j < p; ++j) {
                     alphaW_ += Math.pow(y[k][j], 2);
@@ -123,7 +123,7 @@ public class RNNStratifiedTrainingTask extends RNNTrainingTask {
 
             for (int j = 0; j < p; ++j) {
                 float alphaY;
-                if (isWithAdaptiveLearningStep) {
+                if (adaptiveLearningStep) {
                     alphaY = 0;
                     for (int i = 0; i < n; ++i) {
                         alphaY += Math.pow(w_[j][i], 2);
@@ -139,7 +139,7 @@ public class RNNStratifiedTrainingTask extends RNNTrainingTask {
                 y[k][j] -= alphaY * gamma[j];
             }
 
-            if (isWithNormalisation) rnn.normalizeW_();
+            if (normalization) rnn.normalizeW_();
         }
     }
 
