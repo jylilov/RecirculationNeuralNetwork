@@ -54,12 +54,12 @@ public class BackPropagationTrainingTask extends TrainingTask {
                     for (int i = 0; i < n; ++i) {
                         alpha += Math.pow(x[i], 2);
                     }
-                    alpha = 1 / alpha;
+                    alpha = 1 / (1 + alpha);
 
                     for (int j = 0; j < p; ++j) {
                         alpha_ += Math.pow(y[j], 2);
                     }
-                    alpha_ = 1 / alpha_;
+                    alpha_ = 1 / (1 + alpha_);
                 } else {
                     alpha = alpha_ = this.alpha;
                 }

@@ -79,7 +79,7 @@ public class StratifiedTrainingTask extends TrainingTask {
                 for (int i = 0; i < n; ++i) {
                     alphaW += Math.pow(x[i], 2);
                 }
-                alphaW = 1 / alphaW;
+                alphaW = 1 / (1 + alphaW);
             } else {
                 alphaW = alpha;
             }
@@ -109,7 +109,7 @@ public class StratifiedTrainingTask extends TrainingTask {
                 for (int j = 0; j < p; ++j) {
                     alphaW_ += Math.pow(y[k][j], 2);
                 }
-                alphaW_ = 1 / alphaW_;
+                alphaW_ = 1 / (1 + alphaW_);
             } else {
                 alphaW_ = alpha;
             }
@@ -128,7 +128,7 @@ public class StratifiedTrainingTask extends TrainingTask {
                     for (int i = 0; i < n; ++i) {
                         alphaY += Math.pow(w_[j][i], 2);
                     }
-                    alphaY = 1 / alphaY;
+                    alphaY = 1 / (1 + alphaY);
                 } else {
                     alphaY = alpha;
                 }
